@@ -154,7 +154,7 @@
 
             <dt class="col-sm-3">Recent logs <a href="#" tabindex="-1" role="button" data-toggle="popover"
                     data-trigger="hover" style="dispaly: inline-block;"
-                    data-content="Up to last {{logs.maxLogLines}} log lines"><i
+                    data-content="Up to last {{formatInteger logs.maxLogLines userLocale}} log lines"><i
                         class="fas fa-info-circle text-info"></i></a>
             </dt>
 
@@ -270,6 +270,27 @@
 
                 <span class="local-date-time code-link" data-time="{{account.oauth2.expiresStr}}"
                     title="{{account.oauth2.expiresStr}}"></span>
+            </dd>
+            {{/if}}
+
+            {{#if account.outlookSubscription}}
+            <dt class="col-sm-3">Change subscription</dt>
+            <dd class="col-sm-9">
+
+                <span
+                    class="badge badge-pill badge-{{#if account.outlookSubscription.isValid}}success{{else}}danger{{/if}}"
+                    style="cursor:default;" {{#if account.outlookSubscription.state.error}} data-toggle="popover"
+                    data-trigger="hover" data-title="Subscription error"
+                    data-content="{{account.outlookSubscription.state.error}}" {{/if}}>
+                    {{account.outlookSubscription.stateLabel}}
+                </span>
+
+                {{#if account.outlookSubscription.expirationDateTime}}
+                Valid until <span class="local-date-time code-link"
+                    data-time="{{account.outlookSubscription.subscriptionExpiresStr}}"
+                    title="{{account.outlookSubscription.subscriptionExpiresStr}}"></span>
+                {{/if}}
+
             </dd>
             {{/if}}
 
@@ -1029,7 +1050,6 @@
                     return false
                 }
                 document.getElementById('test-send-results').classList.remove('d-none');
-                console.log('TEST RESULTS', results);
                 document.getElementById('test-send-results').innerHTML = testSendTemplate(results);
 
                 // activate tabs

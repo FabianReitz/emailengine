@@ -1,5 +1,69 @@
 # Changelog
 
+## [2.44.1](https://github.com/postalsys/emailengine/compare/v2.44.0...v2.44.1) (2024-08-15)
+
+
+### Bug Fixes
+
+* **oauth2:** Fixed Gmail API OAuth2 schema ([205f34e](https://github.com/postalsys/emailengine/commit/205f34e1c89eaf003d027aa0664023af0029c53e))
+
+## [2.44.0](https://github.com/postalsys/emailengine/compare/v2.43.3...v2.44.0) (2024-08-15)
+
+
+### Features
+
+* **ms-graph-api:** MS Graph API support ([#431](https://github.com/postalsys/emailengine/issues/431)) ([5e10dd3](https://github.com/postalsys/emailengine/commit/5e10dd3528c8c5ca6898f2ed0800f0d168fb8b33))
+
+
+### Bug Fixes
+
+* **app-password:** Add T-Online to providers needing an app password ([#430](https://github.com/postalsys/emailengine/issues/430)) ([823939b](https://github.com/postalsys/emailengine/commit/823939b1d5e6934876537597ea52b52b4f12ab59))
+* **oauth-tokens:** Fix renewal check for access tokens ([f687aa1](https://github.com/postalsys/emailengine/commit/f687aa11752a2981a1237cc84cca1d26f24d1f49))
+* **outlook-oauth:** Show 'supported account types' as a selectable list instead of a text field input ([fe62e5b](https://github.com/postalsys/emailengine/commit/fe62e5b293307d42c6e8e1c200911d4eff4e26de))
+
+## [2.43.3](https://github.com/postalsys/emailengine/compare/v2.43.2...v2.43.3) (2024-08-01)
+
+
+### Bug Fixes
+
+* **cors:** Added missing OPTIONS handler for CORS ([205480d](https://github.com/postalsys/emailengine/commit/205480d4c150f35aa14edaa918b7635774eface3))
+
+## [2.43.2](https://github.com/postalsys/emailengine/compare/v2.43.1...v2.43.2) (2024-07-29)
+
+
+### Bug Fixes
+
+* **reconnect:** Allow reconnecting paused accounts ([b8e212f](https://github.com/postalsys/emailengine/commit/b8e212f512ad007d3fa3c2678d8dfdbf8155c0ca))
+
+## [2.43.1](https://github.com/postalsys/emailengine/compare/v2.43.0...v2.43.1) (2024-07-21)
+
+
+### Bug Fixes
+
+* **api-docs:** Updated information about total/pages/nextPageCursor ([cd12547](https://github.com/postalsys/emailengine/commit/cd12547096da14b2407156745bb86326134db177))
+* **cli:** Added command 'export' to retrieve raw account data with credentials ([9932801](https://github.com/postalsys/emailengine/commit/99328017918cf978ceadc4cc87f64e9b924d4ee6))
+* **gmail-api:** Fixed webhook notifications for authenticationSuccess and authenticationError ([2c3d63a](https://github.com/postalsys/emailengine/commit/2c3d63a5f62ee3fdfe3245c1e5128e908a679e82))
+* **gmail-api:** Log API requests to user log ([f00f864](https://github.com/postalsys/emailengine/commit/f00f86439af8484c7d55aa3b0e386e09f209dce0))
+* **oauth2:** Fixed broken extra scopes handling ([9185359](https://github.com/postalsys/emailengine/commit/91853599c238c79a326886107e8f62b23dd26973))
+
+## [2.43.0](https://github.com/postalsys/emailengine/compare/v2.42.0...v2.43.0) (2024-07-08)
+
+
+### Features
+
+* **gmail-api:** Gmail API Support ([#421](https://github.com/postalsys/emailengine/issues/421)) ([91b3cad](https://github.com/postalsys/emailengine/commit/91b3cad4537e8b5e2c2b9faad54f87c5d6997d15))
+
+
+### Bug Fixes
+
+* **api:** Added support for paging cursors ([d3f7685](https://github.com/postalsys/emailengine/commit/d3f76857a1d139aa15646fe96dd0ef5d8a791fbe))
+* **api:** Do not allow to proxy connections for accounts with API scopes ([9498fa9](https://github.com/postalsys/emailengine/commit/9498fa9efbf0c6f341239e77514de9903e6195ee))
+* Fix exception when Document Store is disabled but there are embeddings stored ([6d18a48](https://github.com/postalsys/emailengine/commit/6d18a48e146a2aceb7fcf94dad21ce6959188bc4))
+* **font-loading:** Use a locally cached font instead of loading from Google FOnts ([4e53929](https://github.com/postalsys/emailengine/commit/4e539296d4f8bac3d4772fdcf1941611d1289846))
+* **model-labels:** Model label improvements to have named models instead ([dc75dbc](https://github.com/postalsys/emailengine/commit/dc75dbc9693d48d7693df71961443607640f55fb))
+* **paging:** Fixed paging links for OAuth2 apps ([d698082](https://github.com/postalsys/emailengine/commit/d6980826a8136d9f8ae612c4be98a8665619accd))
+* **templates:** Allow running template API requests with account tokens ([dd2da5b](https://github.com/postalsys/emailengine/commit/dd2da5bceecca53b579c12fb83c97dbf59f77c55))
+
 ## [2.42.0](https://github.com/postalsys/emailengine/compare/v2.41.4...v2.42.0) (2024-05-30)
 
 
