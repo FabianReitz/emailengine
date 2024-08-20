@@ -71,7 +71,7 @@ msgstr "Ihr Name"
 
 #: views/accounts/register/imap.hbs:17
 msgid "Enter your full name"
-msgstr "Gib deinen vollen Namen ein"
+msgstr "Geben Sie ihren vollständigen Namen ein"
 
 #: views/accounts/register/imap.hbs:31
 #: views/accounts/register/imap-server.hbs:35
@@ -115,7 +115,7 @@ msgstr "Anwendungspasswort"
 #: views/accounts/register/imap-server.hbs:42
 #: views/accounts/register/imap-server.hbs:121
 msgid "%s accounts require to use an application password for %s."
-msgstr "Für %s-Konten muss ein Anwendungskennwort für %s verwendet werden."
+msgstr "Für %s Konten muss ein Anwendungskennwort für %s verwendet werden."
 
 #: views/accounts/register/imap-server.hbs:43
 #: views/accounts/register/imap-server.hbs:122
@@ -169,11 +169,11 @@ msgstr ""
 
 #: views/accounts/register/imap-server.hbs:183
 msgid "Test settings"
-msgstr "Test-Einstellungen"
+msgstr "Einstellungen testen"
 
 #: views/accounts/register/imap-server.hbs:200
 msgid "Continue without testing"
-msgstr "Ohne Prüfung fortfahren"
+msgstr "Ohne Test fortfahren"
 
 #: views/accounts/register/imap-server.hbs:214
 msgid "Test failed"
@@ -182,7 +182,7 @@ msgstr "Test fehlgeschlagen"
 #: views/accounts/register/imap-server.hbs:220
 msgid "Failed to validate provided email server settings."
 msgstr ""
-"Die angegebenen E-Mail-Server-Einstellungen konnten nicht validiert werden."
+"Die angegebenen E-Mail-Servereinstellungen konnten nicht validiert werden."
 
 #: views/accounts/register/imap-server.hbs:293
 msgid "Failed to validate IMAP server settings"
