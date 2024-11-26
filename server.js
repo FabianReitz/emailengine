@@ -27,7 +27,7 @@ process.env.UV_THREADPOOL_SIZE =
 // cache before wild-config
 const argv = process.argv.slice(2);
 
-const { Worker, SHARE_ENV } = require('worker_threads');
+const { Worker: WorkerThread, SHARE_ENV } = require('worker_threads');
 const packageData = require('./package.json');
 const config = require('wild-config');
 const logger = require('./lib/logger');
@@ -164,7 +164,7 @@ const DEFAULT_MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024;
 const SUBSCRIPTION_CHECK_TIMEOUT = 1 * 24 * 60 * 60 * 1000;
 const SUBSCRIPTION_ALLOW_DELAY = 28 * 24 * 60 * 60 * 1000;
 
-const CONNECION_SETUP_DELAY = getDuration(readEnvValue('EENGINE_CONNECION_SETUP_DELAY') || config.service.setupDelay) || 0;
+const CONNECTION_SETUP_DELAY = getDuration(readEnvValue('EENGINE_CONNECTION_SETUP_DELAY') || config.service.setupDelay) || 0;
 
 config.api.maxSize = getByteSize(readEnvValue('EENGINE_MAX_SIZE') || config.api.maxSize) || DEFAULT_MAX_ATTACHMENT_SIZE;
 config.dbs.redis = readEnvValue('EENGINE_REDIS') || readEnvValue('REDIS_URL') || config.dbs.redis;
@@ -198,6 +198,8 @@ const IMAP_PROXY_PROXY = hasEnvValue('EENGINE_IMAP_PROXY_PROXY')
     ? getBoolean(readEnvValue('EENGINE_IMAP_PROXY_PROXY'))
     : getBoolean(config['imap-proxy'].proxy);
 
+const METRIC_RECENT = 10 * 60 * 1000; // 10min
+
 const HAS_API_PROXY_SET = hasEnvValue('EENGINE_API_PROXY') || typeof config.api.proxy !== 'undefined';
 const API_PROXY = hasEnvValue('EENGINE_API_PROXY') ? getBoolean(readEnvValue('EENGINE_API_PROXY')) : getBoolean(config.api.proxy);
 
@@ -220,6 +222,7 @@ const NO_ACTIVE_HANDLER_RESP = {
 // check for upgrades once in 8 hours
 const UPGRADE_CHECK_TIMEOUT = 1 * 24 * 3600 * 1000;
 const LICENSE_CHECK_TIMEOUT = 20 * 60 * 1000;
+const MAX_LICENSE_CHECK_DELAY = 30 * 24 * 60 * 60 * 1000;
 
 const licenseInfo = {
     active: false,
@@ -368,6 +371,12 @@ const metrics = {
         name: 'queues_processed',
         help: 'Processed job count',
         labelNames: ['queue', 'status']
+    }),
+
+    threads: new promClient.Gauge({
+        name: 'threads',
+        help: 'Worker Threads',
+        labelNames: ['type', 'recent']
     }),
 
     emailengineConfig: new promClient.Gauge({
@@ -596,6 +605,50 @@ let updateServerState = async (type, state, payload) => {
     }
 };
 
+async function getThreadsInfo() {
+    let threadsInfo = [Object.assign({ type: 'main', isMain: true, threadId: 0, online: NOW }, threadStats.usage())];
+
+    for (let [type, workerSet] of workers) {
+        if (workerSet && workerSet.size) {
+            for (let worker of workerSet) {
+                let resourceUsage;
+                try {
+                    resourceUsage = await call(worker, { cmd: 'resource-usage' });
+                } catch (err) {
+                    resourceUsage = {
+                        resourceUsageError: {
+                            error: err.message,
+                            code: err.code
+                        }
+                    };
+                }
+
+                let threadData = Object.assign({ type, threadId: worker.threadId, resourceLimits: worker.resourceLimits }, resourceUsage);
+
+                if (workerAssigned.has(worker)) {
+                    threadData.accounts = workerAssigned.get(worker).size;
+                }
+
+                let workerMeta = workersMeta.has(worker) ? workersMeta.get(worker) : {};
+                for (let key of Object.keys(workerMeta)) {
+                    threadData[key] = workerMeta[key];
+                }
+
+                threadsInfo.push(threadData);
+            }
+        }
+    }
+
+    threadsInfo.forEach(threadInfo => {
+        threadInfo.description = THREAD_NAMES[threadInfo.type];
+        if (THREAD_CONFIG_VALUES[threadInfo.type]) {
+            threadInfo.config = THREAD_CONFIG_VALUES[threadInfo.type];
+        }
+    });
+
+    return threadsInfo;
+}
+
 async function sendWebhook(account, event, data) {
     let serviceUrl = (await settings.get('serviceUrl')) || null;
 
@@ -642,7 +695,7 @@ let spawnWorker = async type => {
         await updateServerState(type, 'spawning');
     }
 
-    let worker = new Worker(pathlib.join(__dirname, 'workers', `${type.replace(/[A-Z]/g, c => `-${c.toLowerCase()}`)}.js`), {
+    let worker = new WorkerThread(pathlib.join(__dirname, 'workers', `${type.replace(/[A-Z]/g, c => `-${c.toLowerCase()}`)}.js`), {
         argv,
         env: SHARE_ENV,
         trackUnmanagedFds: true
@@ -1028,7 +1081,7 @@ async function assignAccounts() {
             msg: 'Assigning connections',
             unassigned: unassigned.size,
             workersAvailable: availableIMAPWorkers.size,
-            setupDelay: CONNECION_SETUP_DELAY
+            setupDelay: CONNECTION_SETUP_DELAY
         });
 
         for (let account of unassigned) {
@@ -1053,8 +1106,8 @@ async function assignAccounts() {
                 runIndex
             });
 
-            if (CONNECION_SETUP_DELAY) {
-                await new Promise(r => setTimeout(r, CONNECION_SETUP_DELAY));
+            if (CONNECTION_SETUP_DELAY) {
+                await new Promise(r => setTimeout(r, CONNECTION_SETUP_DELAY));
             }
         }
     } finally {
@@ -1138,7 +1191,9 @@ let licenseCheckHandler = async opts => {
                     await redis.hdel(`${REDIS_PREFIX}settings`, 'subexp');
                     await redis.hset(`${REDIS_PREFIX}settings`, 'kv', Buffer.from(packageData.version).toString('hex'));
                     if (data.validatedUntil) {
-                        await redis.hset(`${REDIS_PREFIX}settings`, 'ks', new Date(data.validatedUntil).getTime().toString(16));
+                        let validatedUntil = new Date(data.validatedUntil);
+                        let nextCheck = Math.min(now + MAX_LICENSE_CHECK_DELAY, validatedUntil.getTime());
+                        await redis.hset(`${REDIS_PREFIX}settings`, 'ks', new Date(nextCheck).getTime().toString(16));
                     }
                 }
             } catch (err) {
@@ -1322,6 +1377,32 @@ async function updateQueueCounters() {
     metrics.emailengineConfig.set({ config: 'workersImap' }, config.workers.imap);
     metrics.emailengineConfig.set({ config: 'workersWebhooks' }, config.workers.webhooks);
     metrics.emailengineConfig.set({ config: 'workersSubmission' }, config.workers.submit);
+
+    let threadsInfo = await getThreadsInfo();
+
+    let now = Date.now();
+
+    let threadCounts = new Map();
+    for (let workerThreadInfo of threadsInfo || []) {
+        let key = workerThreadInfo.type;
+        let metricKey = `${key}_total`;
+
+        let recent = now - workerThreadInfo.online < METRIC_RECENT;
+        if (recent) {
+            metricKey = `${key}_recent`;
+        }
+
+        if (!threadCounts.has(metricKey)) {
+            threadCounts.set(metricKey, 1);
+        } else {
+            threadCounts.set(metricKey, threadCounts.get(metricKey) + 1);
+        }
+    }
+
+    for (let [key, value] of threadCounts.entries()) {
+        let [type, age] = key.split('_');
+        metrics.threads.set({ type, recent: age === 'recent' ? 'yes' : 'no' }, value || 0);
+    }
 
     for (let queue of ['notify', 'submit', 'documents']) {
         const [resActive, resDelayed, resPaused, resWaiting] = await redis
@@ -1764,47 +1845,7 @@ async function onCommand(worker, message) {
         }
 
         case 'threads': {
-            let threadsInfo = [Object.assign({ type: 'main', isMain: true, threadId: 0, online: NOW }, threadStats.usage())];
-
-            for (let [type, workerSet] of workers) {
-                if (workerSet && workerSet.size) {
-                    for (let worker of workerSet) {
-                        let resourceUsage;
-                        try {
-                            resourceUsage = await call(worker, { cmd: 'resource-usage' });
-                        } catch (err) {
-                            resourceUsage = {
-                                resourceUsageError: {
-                                    error: err.message,
-                                    code: err.code
-                                }
-                            };
-                        }
-
-                        let threadData = Object.assign({ type, threadId: worker.threadId, resourceLimits: worker.resourceLimits }, resourceUsage);
-
-                        if (workerAssigned.has(worker)) {
-                            threadData.accounts = workerAssigned.get(worker).size;
-                        }
-
-                        let workerMeta = workersMeta.has(worker) ? workersMeta.get(worker) : {};
-                        for (let key of Object.keys(workerMeta)) {
-                            threadData[key] = workerMeta[key];
-                        }
-
-                        threadsInfo.push(threadData);
-                    }
-                }
-            }
-
-            threadsInfo.forEach(threadInfo => {
-                threadInfo.description = THREAD_NAMES[threadInfo.type];
-                if (THREAD_CONFIG_VALUES[threadInfo.type]) {
-                    threadInfo.config = THREAD_CONFIG_VALUES[threadInfo.type];
-                }
-            });
-
-            return threadsInfo;
+            return await getThreadsInfo();
         }
 
         case 'rate-limit': {
@@ -1991,6 +2032,8 @@ async function collectMetrics() {
             }
         }
     }
+
+    metricsResult.disconnected = (Number(metricsResult.disconnected) || 0) + (unassigned ? unassigned.size : 0);
 
     Object.keys(metricsResult).forEach(status => {
         metrics.imapConnections.set({ status }, metricsResult[status]);

@@ -9,7 +9,8 @@
     <meta name="description" content="EmailEngine Homepage" />
     <meta name="author" content="Postal Systems OÜ">
 
-    <title>EmailEngine{{#if pageTitle}} &ndash; {{pageTitle}}{{/if}}</title>
+    <title>{{#if pageTitleFull}}{{pageTitleFull}}{{else}}EmailEngine{{#if pageTitle}} &ndash;
+        {{pageTitle}}{{/if}}{{/if}}</title>
 
     <link rel="apple-touch-icon" href="/static/favicon/apple-touch-icon.png" sizes="180x180" />
     <link rel="icon" href="/static/favicon/favicon-32x32.png" sizes="32x32" type="image/png" />
@@ -26,6 +27,10 @@
 
     <link href="/static/css/sb-admin-2.min.css" rel="stylesheet">
     <link href="/static/css/app.css" rel="stylesheet">
+
+    {{#if injectHtmlHead}}
+    {{{injectHtmlHead}}}
+    {{/if}}
 
 </head>
 
@@ -328,10 +333,12 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <a href="{{packageData.homepage}}" target="_blank">EmailEngine</a> v{{packageData.version}}.
+                        <a href="{{packageData.homepage}}" target="_blank" rel="noopener noreferrer">EmailEngine</a>
+                        v{{packageData.version}}.
                         <span class="text-muted">&copy; 2020-{{currentYear}}</span>
 
-                        <a class="text-muted" href="https://postalsys.com/contact" target="_blank">Postal Systems
+                        <a class="text-muted" href="https://postalsys.com/contact" target="_blank"
+                            rel="noopener noreferrer">Postal Systems
                             O&Uuml;</a>.
                         <a class="" href="/admin/legal">
                             <i class="fas fa-fw fa-gavel"></i>
