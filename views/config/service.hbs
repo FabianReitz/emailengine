@@ -323,7 +323,7 @@
 
     <div id="templates_settings" class="card mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Templates</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Public website templates</h6>
             <div class="dropdown no-arrow">
                 <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
                     aria-haspopup="true" aria-expanded="false">
@@ -342,6 +342,21 @@
 
             <p>These settings apply to all publicly accessible pages, such as 404 error pages, the hosted authentication
                 form, and the virtual mailing list unsubscribe page.</p>
+
+            <div class="form-group">
+                <div class="text-muted float-right code-link">[<a href="/admin/swagger#/Settings/postV1Settings"
+                        target="_blank" rel="noopener noreferrer">pageBrandName</a>]</div>
+
+                <label for="settingsPageBrandName">Brand name</label>
+                <input type="text" class="form-control {{#if errors.pageBrandName}}is-invalid{{/if}}"
+                    id="settingsPageBrandName" name="pageBrandName" value="{{values.pageBrandName}}"
+                    data-lpignore="true" autocomplete="off" placeholder="Brand name like &quot;EmailEngine&quot;" />
+                {{#if errors.pageBrandName}}
+                <span class="invalid-feedback">{{errors.pageBrandName}}</span>
+                {{/if}}
+                <small class="form-text text-muted">Brand name to use in the HTML title element (defaults to
+                    <em>"EmailEngine"</em>)</small>
+            </div>
 
             <div class="form-group">
 
@@ -538,6 +553,8 @@
 <form id="preview-form" method="post" action="/admin/config/service/preview">
     <input type="hidden" name="crumb" value="{{crumb}}" />
     <input type="hidden" name="templateHeader" id="preview-header-elm">
+    <input type="hidden" name="templateHtmlHead" id="preview-head-elm">
+    <input type="hidden" name="pageBrandName" id="preview-brand-name-elm">
 </form>
 
 
@@ -603,14 +620,7 @@
         });
 
 
-        document.getElementById('preview-header-btn').addEventListener('click', e => {
-            e.preventDefault();
-            let previewWindow = window.open('about:blank', 'preview-window', '');
-            let previewForm = document.getElementById('preview-form');
-            previewForm.target = 'preview-window';
-            document.getElementById('preview-header-elm').value = editorHtml.getValue();
-            previewForm.submit();
-        });
+
 
 
         const editors = new Map();
@@ -650,6 +660,20 @@
         editorHtmlHead.setTheme("ace/theme/xcode");
         editorHtmlHead.session.setMode("ace/mode/handlebars");
         editorHtmlHead.session.setValue(document.getElementById('templateHtmlHeadElement').value);
+
+
+        document.getElementById('preview-header-btn').addEventListener('click', e => {
+            e.preventDefault();
+            let previewWindow = window.open('about:blank', 'preview-window', '');
+            let previewForm = document.getElementById('preview-form');
+            previewForm.target = 'preview-window';
+
+            document.getElementById('preview-brand-name-elm').value = document.getElementById('settingsPageBrandName').value;
+            document.getElementById('preview-header-elm').value = editorHtml.getValue();
+            document.getElementById('preview-head-elm').value = editorHtmlHead.getValue();
+
+            previewForm.submit();
+        });
 
         document.getElementById('settings-form').addEventListener('submit', () => {
             document.getElementById('templateHeaderElement').value = editorHtml.getValue();

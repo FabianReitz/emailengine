@@ -1,5 +1,83 @@
 # Changelog
 
+## [2.50.1](https://github.com/postalsys/emailengine/compare/v2.50.0...v2.50.1) (2025-01-19)
+
+
+### Bug Fixes
+
+* **web:** Fixed preview function for public website templates in the admin UI ([6f3567b](https://github.com/postalsys/emailengine/commit/6f3567be5abd796f3397014a37021809a6645112))
+
+## [2.50.0](https://github.com/postalsys/emailengine/compare/v2.49.7...v2.50.0) (2025-01-13)
+
+
+### Features
+
+* **oauth2-apps:** Added search field to the OAuth2 application listing page to search OAuth2 applications ([69144fe](https://github.com/postalsys/emailengine/commit/69144fe01fdfba3d5448419a7ef46abba5c1aa4c))
+
+
+### Bug Fixes
+
+* **ms-graph-api:** Fixed plaintext content handling when retrieving emails from MS Graph API ([0166a0a](https://github.com/postalsys/emailengine/commit/0166a0a8121feab6900da49d2d544899f2f23fd7))
+
+## [2.49.7](https://github.com/postalsys/emailengine/compare/v2.49.6...v2.49.7) (2025-01-09)
+
+
+### Bug Fixes
+
+* **imap-auth:** Bumped ImapFlow dependency to fix issue with AUTHENTICATE LOGIN on some IMAP servers ([c1a5fba](https://github.com/postalsys/emailengine/commit/c1a5fbaedd7c1d3ade881ee48db8cc9e238a042b))
+
+## [2.49.6](https://github.com/postalsys/emailengine/compare/v2.49.5...v2.49.6) (2025-01-08)
+
+
+### Bug Fixes
+
+* **deps:** Bumped ImapFlow to handle invalid BODYSTRUCTURE from BlueMind ([1174a29](https://github.com/postalsys/emailengine/commit/1174a29aea60f5f2fc24c35eb565f0e2e1633e86))
+* **http-requests:** Use undici RetryAgent for HTTP request network errors and 429 rate limiting, removed custom 429 handler ([bafcd1c](https://github.com/postalsys/emailengine/commit/bafcd1c1551a2c00809b07d31e2ba67b1c9d19df))
+* **message-upload:** Fix message upload if uploading to a child folder of Inbox using MS Graph API ([2c14b5e](https://github.com/postalsys/emailengine/commit/2c14b5eb80ff1fe60e03504bd6550e06698210ee))
+* **ms-graph-api:** Upload message as a JSON structure instead of EML with MS Graph API in order to set meta info like flags ([c7fde6f](https://github.com/postalsys/emailengine/commit/c7fde6fedb127773cfbf4cff1937cad1a91148cd))
+* **ui:** Replaced 2024 with 2025 in static HTML pages ([99e805b](https://github.com/postalsys/emailengine/commit/99e805b5ce1e373b60bbaa2b9f0fa138f8f8d27b))
+
+## [2.49.5](https://github.com/postalsys/emailengine/compare/v2.49.4...v2.49.5) (2024-12-30)
+
+
+### Bug Fixes
+
+* **Auth-server:** Ensure correct oauth2 username and history ID for accounts added with auth server ([aa68c0d](https://github.com/postalsys/emailengine/commit/aa68c0d7519565d0ce7915a4397148199fc664d2))
+* **oauth-flow:** Fixed page title on the redirect page after OAuth2 code has been received ([b2c0c5a](https://github.com/postalsys/emailengine/commit/b2c0c5a28da3550eeb8754b5efec18254b6d8ff5))
+* **templates:** Allow setting brand name to replace 'EmailEngine' in the HTML title ([bf85c06](https://github.com/postalsys/emailengine/commit/bf85c06aaf92d2f3d54dbfde5771a2df3a71b9b9))
+
+## [2.49.4](https://github.com/postalsys/emailengine/compare/v2.49.3...v2.49.4) (2024-12-13)
+
+
+### Bug Fixes
+
+* **cors:** Removed custom OPTIONS preflight handler in favor of default Hapi CORS handler ([6427728](https://github.com/postalsys/emailengine/commit/6427728bcc56249bb4acb4adcc817bd9c2221f2f))
+* **oauth2:** Fixed field encryption for OAuth2 apps ([a0c3eaa](https://github.com/postalsys/emailengine/commit/a0c3eaacc117257e3b1303f161650c0b16ff051f))
+
+## [2.49.3](https://github.com/postalsys/emailengine/compare/v2.49.2...v2.49.3) (2024-12-09)
+
+
+### Bug Fixes
+
+* **gmail-api:** Fixed attachment forwarding when using Gmail API ([6aef655](https://github.com/postalsys/emailengine/commit/6aef65556d501a3df7dde845ae9470bf575ebb56))
+* **gmail-api:** Fixed threading for replied messages when using Gmail API ([2b4d5bb](https://github.com/postalsys/emailengine/commit/2b4d5bbbebf66ecf44a4dcefa789e7813b043d1e))
+
+## [2.49.2](https://github.com/postalsys/emailengine/compare/v2.49.1...v2.49.2) (2024-12-03)
+
+
+### Bug Fixes
+
+* **deps:** Downgraded elasticsearch dependency to avoid including ESM dependencies ([78d6aed](https://github.com/postalsys/emailengine/commit/78d6aed2a0baba61fd381785d1cc63e9b1654871))
+
+## [2.49.1](https://github.com/postalsys/emailengine/compare/v2.49.0...v2.49.1) (2024-12-03)
+
+
+### Bug Fixes
+
+* **delivery-test:** Fixed gateway usage with delivery tests ([ec94223](https://github.com/postalsys/emailengine/commit/ec9422397fe392f815c8c3c0f8337f4a5cef55cd))
+* **deps:** Bumped email-text-tools to fix failing preProcessHtml and webSafeHtml ([4de02ae](https://github.com/postalsys/emailengine/commit/4de02aeb98a1f481cabcc309f6b58bfa5820affe))
+* Prevent throwing an exception if serviceUrl is not set ([e947a0b](https://github.com/postalsys/emailengine/commit/e947a0bf6f15cacbd2426dd81df03f9acba6a340))
+
 ## [2.49.0](https://github.com/postalsys/emailengine/compare/v2.48.7...v2.49.0) (2024-11-10)
 
 
